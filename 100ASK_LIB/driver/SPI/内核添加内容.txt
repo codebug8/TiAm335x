@@ -1,0 +1,21 @@
+SPI思路：
+因为片选的原因，导致一个SPI只能挂载一个SPI设备。
+最开始的解决方案是，驱动先生成/dev/spidev1.x，应用层通过/dev/spidev1.x的方式操作某个SPI，对于部分设备(OLED)是这样做的。
+但后来发现，每个驱动都要在应用层重新写操作逻辑，导致内核就算自带有该驱动(adxl34x)，也不能直接使用。
+现在改进，对spidev和adxl34x封装一层，比如先生成/dev/spidev节点，应用层通过ioctl控制/dev/spidev生成/dev/spidev1.x。
+同理，先生成/dev/adxl34x节点，应用层通过ioctl控制/dev/adxl34x，使内核自带的驱动注册。
+
+Device Drivers  --->
+	[*] SPI support  ---> 
+		<*>   McSPI driver for OMAP 
+		//<*>   User mode SPI device driver support
+
+		
+		
+ADXL345:
+Device Drivers  --->
+	Input device support  ---> 
+		<*>   Event interface
+		[*]   Miscellaneous devices  --->
+			<*>   Analog Devices ADXL34x Three-Axis Digital Accelerometer
+				//<*>     support SPI bus connection (NEW)

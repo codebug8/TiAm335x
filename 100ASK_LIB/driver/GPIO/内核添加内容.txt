@@ -1,0 +1,14 @@
+板载按键(这个驱动应该不适合本板子硬件)：
+Device Drivers  --->
+	Input device support  --->
+		-*-   Matrix keymap support library
+		<*>   Event interface
+		[*]   Keyboards  --->
+			<*>   GPIO driven matrix keypad support
+			
+红外遥控：
+Device Drivers  --->
+	<*> Multimedia support  --->
+		 [*]   Remote Controller support
+		 [*]   Remote controller decoders (NEW)  --->
+		 [*]   Remote Controller devices  --->

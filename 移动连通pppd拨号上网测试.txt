@@ -1,0 +1,79 @@
+[root@ebf6ull:~]# vi /etc/ppp/gprs-connect-chat
+#Chat script for China Mobile, used SIMCOM sim4100 TD module.
+TIMEOUT 15
+ABORT "DELAYED"
+ABORT "BUSY"
+ABORT "ERROR"
+ABORT "NO DIALTONE"
+ABORT "NO CARRIER"
+TIMEOUT 40
+'' \rAT
+OK ATS0=0
+OK ATE0V1
+#如果是移动卡，3GNET设置为CMNET
+OK AT+CGDCONT=1,"IP","3GNET"
+#如果使用电信卡
+OK AT+CGDCONT=1,"IP","3GNET" 改为 OK  "AT+ZCAPN=card,card"
+OK ATDT*99*1# 改为 ATD#777
+
+
+OK AT+CGEQREQ=1,2,128,384,,,0,,,,,,
+
+OK ATDT*99*1#
+
+
+CONNECT
+
+
+
+
+
+[root@ebf6ull:~]#  vi /etc/ppp/peers/gprsdial
+#/etc/ppp/peers/gprsdial
+# This is pppd script for China Mobile, used SIMCOM SIM7100 Module
+# Usage: root>pppd call gprs
+#Interface should be used is the interface which connects physics interface of S
+/dev/ttyUSB3
+115200
+crtscts
+modem
+#noauth
+debug
+nodetach
+#hide-password
+usepeerdns
+noipdefault
+defaultroute
+user "cmnet"
+0.0.0.0:0.0.0.0
+#ipcp-accept-local
+#ipcp-accept-remote
+#lcp-echo-failure 12
+#lcp-echo-interval 3
+#noccp
+#novj
+#novjccomp
+#persist
+connect '/usr/sbin/chat -s -v -f /etc/ppp/gprs-connect-chat'
+#disconnect '/bin/chat -v -f /etc/ppp/gprs-disconnect-chat'
+ 
+6. 拨号
+[root@ebf6ull:~]# pppd call gprsdial
+
+
+#发送短信
+cat /dev/ttyUSB2 &
+
+echo -e "AT+CCID\r"  > /dev/ttyUSB2
+
+
+echo -e "AT+CMGF=1\r"  > /dev/ttyUSB2   				//   设置TEXT MODE
+echo -e "AT+CSCS="GSM"\r"  > /dev/ttyUSB2
+echo -e "AT+CMGS="18339020495"\r"  > /dev/ttyUSB2 				// 其中短信要发给谁，号码就填谁的
+echo -e "AT+CMGS=39\r"  > /dev/ttyUSB2  //这里是用CMGS,不是CMGW
+0011000D91685106686525F60008AA1800740065007300740020006500780061006D0070006C0065//发送这个数据后面别加换行
+
+//查看信号质量
+echo -e "AT+CSQ\r"  > /dev/ttyUSB2
+echo -e "AT+QGPSCFG="OUTPUT"\r"  > /dev/ttyUSB2
+echo -e "AT+QGPS=1\r"  > /dev/ttyUSB2
